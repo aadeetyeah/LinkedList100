@@ -5,8 +5,124 @@ struct node{
 	int data;
 	struct node *next;
 };
-int length(struct node*);
 
+void display(struct node**);
+void createNode(struct node**);
+void reverse(struct node**);
+int count(struct node**);
+void LLcopyLastnEl(struct node**,struct node**);
+int subList(struct node**,struct node**);
+
+int main(){
+	struct node *head=NULL;
+	struct node *dest=NULL;
+	int itr1,num,from;
+	printf("Enter no. of nodes to be created.\n");
+	scanf("%d",&num);
+	for(itr1=0;itr1<num;itr1++){
+		createNode(&head);	
+	}
+	printf("Input src Linked List: ");
+	display(&head);
+	printf("Enter no. of nodes to be created.\n");
+	scanf("%d",&num);
+	for(itr1=0;itr1<num;itr1++){
+		createNode(&dest);	
+	}
+	printf("\ndestination Linked List: ");
+	display(&dest);
+	int pos=subList(&head,&dest);
+	printf("Pos: %d\n",pos);
+	return 0;
+}
+
+int subList(struct node** src,struct node** dest){
+	struct node* temp1=*src,*bckupT2=NULL;
+	struct node* temp2=*dest;
+	int pos,cnt=1,cnt2=0,lenS;
+	if(*src==NULL || *dest==NULL){
+		printf("src or dest list is empty.\n");
+		return -1;
+	}else{
+		lenS=count(src);	//count of sublist
+		while(temp2!=NULL){	//running dest till last node
+			if(temp1->data==temp2->data){	//if first element of both lists are equal then if condtn executes
+				pos=cnt;	//save the first pos where first elements are equal
+				bckupT2=temp2;	//save dest location before complete comparison with src list
+				cnt2=0;		//src list counter to compare with its original length
+				while(temp1!=NULL){	//src list compare with dest list from 1st equal location
+					if(temp1->data==temp2->data){
+						cnt2++;			//if elements equal increment to compare with leng
+					}
+					temp1=temp1->next;
+					temp2=temp2->next;
+				}
+				if(lenS==cnt2){		//if length and equal counter are equal return saved pos of 1st node
+					return pos;
+				}
+				temp1=*src;	//if not equal again src will be at starting location
+				temp2=bckupT2;	//saved dest location again assigned back to dest for further comparisons
+			}
+			cnt++;	//position counter	
+			temp2=temp2->next;
+		}
+	}
+}
+
+int count(struct node **head){
+	struct node *temp=*head;
+	int cnt=1;
+	if(*head==NULL){
+		return 0;
+	}
+	while(temp->next!=NULL){
+		temp=temp->next;
+		cnt++;
+	}
+	return cnt;
+}
+void LLcopyLastnEl(struct node **head,struct node **dest){
+	struct node *htemp=*head;
+	int itr1,itr2;
+	int cnt=count(head);
+	int arr[cnt];
+	for(itr1=0;itr1<cnt;itr1++){
+		arr[itr1]=htemp->data;
+		htemp=htemp->next;
+	}
+	int no,sum,no1,prime=0;
+	struct node *dtemp=*dest;
+	struct node *newNode=NULL;
+	for(itr1=0;itr1<cnt;itr1++){
+		no=arr[itr1];
+		sum=0;
+		prime=0;
+		while(no>0){
+			no1=no%10;
+			sum=sum+no1;
+			no=no/10;
+		}
+		for(itr2=1;itr2<=sum/2;itr2++){
+			if(sum%itr2==0){
+				prime++;
+			}	
+		}
+		if(prime==1){
+			dtemp=*dest;
+			newNode=(struct node*)malloc(sizeof(struct node));
+			newNode->data=arr[itr1];
+			newNode->next=NULL;
+			if(*dest==NULL){
+				*dest=newNode;
+			}else{
+				while(dtemp->next!=NULL){
+					dtemp=dtemp->next;
+				}
+				dtemp->next=newNode;
+			}
+		}
+	}
+}
 void createNode(struct node **head){
 	struct node *temp=*head;
 	struct node *newNode;
@@ -24,67 +140,24 @@ void createNode(struct node **head){
 	}
 }
 void display(struct node **head){
-
-}
-int detectSubList(struct node **src,struct node **dest){
-	struct node *s=*src;
-	struct node *d=*dest;
-	int pos;
-	int itr1=1;
-	int cnt=0;
-	int it;
-	struct node *d1=NULL;
-	int len=length(s);
-	while(d!=NULL){
-		d1=d;
-		it=itr1;
-		while(s!=NULL){
-			if(s->data==d1->data){
-				cnt++;
-				pos=it;
-				s=s->next;
-				d1=d1->next;
-				it++;
-			}else{
-				break;
-			}
-		}
-		d=d->next;
-		itr1++;
-	}
-		printf("len:%d\ncnt:%d\n",len,cnt);
-	if(len==cnt){
-		printf("len:%d\ncnt:%d\n",len,cnt);
-		return pos-cnt;
-	}
-}
-int length(struct node *head){
-	struct node *temp=head;
-	int len=1;
-	if(head==NULL){
-		return 0;
-	}
+	struct node *temp=*head;
 	while(temp->next!=NULL){
+		printf("|%d|->",temp->data);
 		temp=temp->next;
-		len++;
 	}
-	return len;
+	printf("|%d|",temp->data);
 }
-int main(){
-	struct node *src=NULL;
-	struct node *dest=NULL;
-	int s,d;
-	printf("Enter no. of src nodes to be created.\n");
-	scanf("%d",&s);
-	for(int itr1=0;itr1<s;itr1++){
-		createNode(&src);
+void reverse(struct node **head){
+	struct node *first=*head;
+	struct node *next1=*head;
+	struct node *temp=NULL;
+	while(first->next!=NULL){
+		next1=first->next;
+		first->next=temp;
+		temp=first;
+		first=next1;
 	}
-	printf("Enter no. of dest nodes to be created.\n");
-	scanf("%d",&d);
-	for(int itr1=0;itr1<d;itr1++){
-		createNode(&dest);
-	}
-	int pos=detectSubList(&src,&dest);
-	printf("Pos:%d\n",pos);
-	return 0;
+	first->next=temp;
+	*head=first;	
 }
+
